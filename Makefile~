@@ -1,9 +1,0 @@
-all:	saikoro.tex saikoro.c
-	gcc -o saikoro saikoro.c
-
-%.tex:	%.w
-	cweave $<
-
-%.c:	%.w
-	ctangle $<
-

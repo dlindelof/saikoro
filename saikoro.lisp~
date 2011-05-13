@@ -1,9 +1,0 @@
-(defstruct square
-  "Representation of a square"
-  value
-  (neighbors ())
-  (dof ()))
-
-(defun remove-square (square)
-  (dolist (neighbor (square-neighbors square))
-    (delete square (square-neighbors neighbor))))

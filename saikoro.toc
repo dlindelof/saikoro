@@ -1,3 +1,0 @@
-\catcode `\@=11\relax 
-
-\catcode `\@=12\relax 
