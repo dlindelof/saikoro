@@ -60,3 +60,43 @@
                     collect (cond ((= pos p) player)
                                   ((eq sq player) 0)
                                   (t sq)))))
+
+(defun current-moves (tree)
+  (third tree))
+
+(defun current-board (tree)
+  (second tree))
+
+(defun current-player (tree)
+  (first tree))
+
+(defun play-vs-human (tree)
+  (print-info tree)
+  (if (current-moves tree)
+      (play-vs-human (handle-human tree))
+      (announce-winner (first tree))))
+
+(defun print-info (tree)
+  (fresh-line)
+  (format t "Current player: ~A" (current-player tree))
+  (draw-board (current-board tree)))
+
+(defun handle-human (tree)
+  (fresh-line)
+  (princ "Choose your move: ")
+  (fresh-line)
+  (let ((moves (current-moves tree)))
+    (loop for move in moves
+         for n from 1
+         do
+          (progn (format t "~A. ~A -> ~A " n (player-pos (current-player tree) (current-board tree)) (first move))
+                 (fresh-line)
+           ))
+    
+    (fresh-line)
+    (second (nth (1- (read)) moves))))
+
+(defun announce-winner (loser)
+  (if (eq 'A loser)
+      (format t "B wins!")
+      (format t "A wins!")))
