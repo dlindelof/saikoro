@@ -8,8 +8,8 @@
 (defun gen-board ()
   (let ((board (board-array (loop for n below *board-squares-num*
                                collect (1+ (random *dice-max*))))))
-;    (setf (aref board 0) 'A)
-;    (setf (aref board (1- *board-squares-num*)) 'B)
+    (setf (aref board 0) 'A)
+    (setf (aref board (1- *board-squares-num*)) 'B)
     board))
 
 (defun draw-board (board)
@@ -97,6 +97,34 @@
     (second (nth (1- (read)) moves))))
 
 (defun announce-winner (loser)
+  (fresh-line)
   (if (eq 'A loser)
       (format t "B wins!")
       (format t "A wins!")))
+
+(defun rate-position (player tree)
+  (let ((moves (current-moves tree)))
+    (if moves
+        (apply (if (eq (current-player tree)
+                       player)
+                   #'max
+                   #'min)
+               (get-ratings player tree))
+        (if (eq (current-player tree) player)
+            0
+            1))))
+
+(defun get-ratings (player tree)
+  (mapcar (lambda (move)
+            (rate-position player (second move)))
+          (current-moves tree)))
+
+(defun handle-computer (tree)
+  (let ((ratings (get-ratings (current-player tree) tree)))
+    (second (nth (position (apply #'max ratings) ratings) (current-moves tree)))))
+
+(defun play-vs-computer (tree)
+  (print-info tree)
+  (cond ((null (current-moves tree)) (announce-winner (current-player tree)))
+        ((eq 'A (current-player tree)) (play-vs-computer (handle-human tree)))
+        (t (play-vs-computer (handle-computer tree)))))
