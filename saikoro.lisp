@@ -1,5 +1,5 @@
-(defparameter *board-size* 3)
-(defparameter *dice-max* 3)
+(defparameter *board-size* 4)
+(defparameter *dice-max* 4)
 (defparameter *board-squares-num* (* *board-size* *board-size*))
 
 (defun board-array (lst)
@@ -14,7 +14,7 @@
 
 (defun draw-board (board)
   (fresh-line)
-  (format t "|~{~< |~%|~,8:;~2@A~>~} |"
+  (format t "|~{~< |~%|~,10:;~2@A~>~} |"
           (loop for square across board collect square)))
   
 (defun game-tree (player board)
