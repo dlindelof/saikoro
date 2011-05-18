@@ -2,6 +2,22 @@
 (defparameter *dice-max* 4)
 (defparameter *board-squares-num* (* *board-size* *board-size*))
 
+(defun neighbors (pos)
+  (let ((up (- pos *board-size*))
+        (down (+ pos *board-size*)))
+  (loop for p in (append (list up down)
+                         (unless (zerop (mod pos *board-size*)) (list (1- pos)))
+                         (unless (zerop (mod (1+ pos) *board-size*)) (list (1+ pos))))
+     when (and (>= p 0)
+               (< p *board-squares-num*))
+       collect p)))
+
+(defparameter *neighbors* (make-array 
+                           *board-squares-num*
+                           :initial-contents 
+                           (loop for p below *board-squares-num*
+                              collect (neighbors p))))
+
 (defun board-array (lst)
   (make-array *board-squares-num* :initial-contents lst))
 
@@ -28,24 +44,13 @@
 (defun player-pos (player board)
   (position player board))
 
-(defun neighbors (pos board)
-  (let ((up (- pos *board-size*))
-        (down (+ pos *board-size*)))
-  (loop for p in (append (list up down)
-                         (unless (zerop (mod pos *board-size*)) (list (1- pos)))
-                         (unless (zerop (mod (1+ pos) *board-size*)) (list (1+ pos))))
-     when (and (>= p 0)
-               (< p *board-squares-num*)
-               (numberp (value p board))
-               (> (value p board) 0))
-       collect p)))
-
 (defun moves (player board)
   (defun moves* (pos board n)
     (when (<= n *dice-max*)
-      (let ((nb (neighbors pos board)))
+      (let ((nb (aref *neighbors* pos)))
         (remove-duplicates (concatenate 'list
-                                        (mapcan (lambda (x) (and (= (value x board) n)
+                                        (mapcan (lambda (x) (and (numberp (value x board))
+                                                                 (= (value x board) n)
                                                                  (list x))) nb)
                                         (mapcan (lambda (x) (moves* x board (1+ n))) nb))))))
   (mapcar (lambda (m)
