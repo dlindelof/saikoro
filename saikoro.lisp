@@ -48,11 +48,13 @@
   (defun moves* (pos board n)
     (when (<= n *dice-max*)
       (let ((nb (aref *neighbors* pos)))
-        (remove-duplicates (concatenate 'list
-                                        (mapcan (lambda (x) (and (numberp (value x board))
-                                                                 (= (value x board) n)
-                                                                 (list x))) nb)
-                                        (mapcan (lambda (x) (moves* x board (1+ n))) nb))))))
+        (remove-duplicates
+         (mapcan (lambda (p)
+                   (let ((v (value p board)))
+                     (when (numberp v)
+                       (append (when (= v n) (list p))
+                               (when (> v 0) (moves* p board (1+ n)))))))
+                   nb)))))
   (mapcar (lambda (m)
             (list m
                   (game-tree (if (eq player 'A) 'B 'A)
@@ -133,3 +135,6 @@
   (cond ((null (current-moves tree)) (announce-winner (current-player tree)))
         ((eq 'A (current-player tree)) (play-vs-computer (handle-human tree)))
         (t (play-vs-computer (handle-computer tree)))))
+
+(defun play ()
+  (play-vs-computer (game-tree 'A (gen-board))))
